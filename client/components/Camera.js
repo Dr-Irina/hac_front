@@ -17,7 +17,7 @@ class PoseNet extends Component {
     nmsRadius: 20,
     outputStride: 32,
     imageScaleFactor: 0.5,
-    skeletonColor: '#fff',
+    skeletonColor: '#ffadea',
     skeletonLineWidth: 6,
     loadingText: 'Loading...please be patient...'
   }
