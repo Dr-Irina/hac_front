@@ -33,10 +33,10 @@ export default class MenuExampleInvertedVertical extends Component {
             <Menu vertical inverted fluid color={'teal'} style={{height: '100%', display: 'flex', justifyContent: 'space-between'}}>
                 <Menu.Item
                     onMouseEnter={(e) => {
-                        let fit = this.onHor(e, 'fitness');
+                        let fit = this.onHor(e, 'Fitness');
                     }
                     }
-                    active={activeItem === 'fitness'}
+                    active={activeItem === 'Fitness'}
                     onClick={this.handleItemClick}
                     style={{height: '20%', width: '100%', display: 'flex', justifyContent: 'center', flexDirection: 'column', textAlign: 'center', fontFamily: 'HelveticaBold', fontSize: '4vh'}}>
                     <Link to={'/fitnes'}>Фитнес</Link>
@@ -44,27 +44,27 @@ export default class MenuExampleInvertedVertical extends Component {
 
                 <Menu.Item
                     onMouseEnter={(e) => {
-                        this.onHor(e, 'box')}
+                        this.onHor(e, 'Box')}
                     }
 
-                    active={activeItem === 'box'}
+                    active={activeItem === 'Box'}
                     onClick={this.handleItemClick}
                     style={{height: '20%', width: '100%', display: 'flex', justifyContent: 'center', flexDirection: 'column', textAlign: 'center', fontFamily: 'HelveticaBold', fontSize: '4vh'}}
                 ><Link to={'/box'}>Бокс</Link></Menu.Item>
                 <Menu.Item
                     onMouseEnter={(e) => {
-                        this.onHor(e, 'tennis')}
+                        this.onHor(e, 'Tennis')}
                     }
-                    active={activeItem === 'tennis'}
+                    active={activeItem === 'Tennis'}
                     onClick={this.handleItemClick}
                     style={{height: '20%', width: '100%', display: 'flex', justifyContent: 'center', flexDirection: 'column', textAlign: 'center', fontFamily: 'HelveticaBold', fontSize: '4vh'}}
                 ><Link to={'/tennis'}>Теннис</Link>
                 </Menu.Item>
                 <Menu.Item
                     onMouseEnter={(e) => {
-                        this.onHor(e, 'dance')}
+                        this.onHor(e, 'Dance')}
                     }
-                    active={activeItem === 'dance'}
+                    active={activeItem === 'Dance'}
                     onClick={this.handleItemClick}
                     style={{height: '20%', width: '100%', display: 'flex', justifyContent: 'center', flexDirection: 'column', textAlign: 'center', fontFamily: 'HelveticaBold', fontSize: '4vh'}}
                 ><Link to={'/dance'}>Танцы</Link>
