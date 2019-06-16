@@ -8,6 +8,7 @@ import Camera from './components/Camera'
 import Skelet from "./components/Skelet";
 import VideoOnMain from "./components/VideoOnMain";
 import Fitness from "./components/Fitnes";
+import MyTry from "./components/myTry";
 
 
 
@@ -76,15 +77,18 @@ const App = () => {
               <Router>
                   <div style={{height: '100%', width: '100%'}}>
                       <Switch>
-              <Route exact path={'/'} component={() => {
-                  return(
-                      <VideoOnMain style={{height: '100%', width: '100%', zIndex: '0', position: 'absolute'}} src={videopr.src}/>
-                  )
-              }} />
+                          <Route exact path={'/'} component={VideoOnMain}/>
+              {/*<Route exact path={'/'} component={() => {*/}
+              {/*    return(*/}
+              {/*        <VideoOnMain style={{height: '100%', width: '100%', zIndex: '0', position: 'absolute'}} src={videopr.src}/>*/}
+              {/*    )*/}
+              {/*}} />*/}
               <Route exact path={'/fitnes'} component={() => {
                   return(<Fitness/>)
               }}/>
-              <Route exact path={'/prised'} component={Camera}/>
+              {/*<Route exact path={'/prised'} component={Camera}/>*/}
+              <Route exact path={'/prised'} component={MyTry}/>
+              <Route exact path={'/prised/camera'} component={Camera}/>
                       </Switch>
                       </div>
                   </Router>
