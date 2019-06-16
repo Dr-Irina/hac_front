@@ -1,3 +1,4 @@
 module.exports = {
-  PRISYAD: 'PRISYAD'
-}
+  PRISYAD: 'PRISYAD',
+  PRISYADONE: 'PRISYADONE',
+};

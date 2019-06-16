@@ -1,7 +1,10 @@
 import {drawKeyPoints, drawSkeleton} from './utils'
 import React, {Component} from 'react'
 import * as posenet from '@tensorflow-models/posenet'
+import io from 'socket.io-client'
+import {PRISYAD, PRISYADONE} from './Events'
 
+const socketURL = 'http://localhost:3030'
 class PoseNet extends Component {
   static defaultProps = {
     videoWidth: 900,
@@ -17,16 +20,19 @@ class PoseNet extends Component {
     nmsRadius: 20,
     outputStride: 32,
     imageScaleFactor: 0.5,
-    skeletonColor: '#ffadea',
+    skeletonColor: '#fff',
     skeletonLineWidth: 6,
     loadingText: 'Loading...please be patient...'
   }
 
   constructor(props) {
-    super(props, PoseNet.defaultProps);
+    super(props, PoseNet.defaultProps)
+    this.handleClick = this.handleClick.bind(this)
     this.state = {
       isRecording: false,
-      arr: []
+      arr: [],
+      socket: null,
+      cadr: 0
     }
   }
 
@@ -38,10 +44,17 @@ class PoseNet extends Component {
     this.video = elem
   }
 
+  componentWillMount() {
+    this.initSocket()
+  }
 
-
-
-
+  initSocket = () => {
+    const socket = io(socketURL)
+    socket.on('connect', () => {
+      console.log('connected')
+    })
+    this.setState({socket})
+  }
   async componentDidMount() {
     try {
       await this.setupCamera()
@@ -63,7 +76,6 @@ class PoseNet extends Component {
 
     this.detectPose()
   }
-
 
   async setupCamera() {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -106,25 +118,24 @@ class PoseNet extends Component {
     this.poseDetectionFrame(canvasContext)
   }
 
-
   poseDetectionFrame(canvasContext) {
     const {
       algorithm,
-      imageScaleFactor, 
-      flipHorizontal, 
-      outputStride, 
-      minPoseConfidence, 
-      minPartConfidence, 
-      maxPoseDetections, 
-      nmsRadius, 
-      videoWidth, 
-      videoHeight, 
-      showVideo, 
-      showPoints, 
-      showSkeleton, 
-      skeletonColor, 
-      skeletonLineWidth 
-      } = this.props
+      imageScaleFactor,
+      flipHorizontal,
+      outputStride,
+      minPoseConfidence,
+      minPartConfidence,
+      maxPoseDetections,
+      nmsRadius,
+      videoWidth,
+      videoHeight,
+      showVideo,
+      showPoints,
+      showSkeleton,
+      skeletonColor,
+      skeletonLineWidth
+    } = this.props
 
     const posenetModel = this.posenet
     const video = this.video
@@ -135,22 +146,22 @@ class PoseNet extends Component {
       switch (algorithm) {
         case 'multi-pose': {
           poses = await posenetModel.estimateMultiplePoses(
-          video, 
-          imageScaleFactor, 
-          flipHorizontal, 
-          outputStride, 
-          maxPoseDetections, 
-          minPartConfidence, 
-          nmsRadius
+            video,
+            imageScaleFactor,
+            flipHorizontal,
+            outputStride,
+            maxPoseDetections,
+            minPartConfidence,
+            nmsRadius
           )
           break
         }
         case 'single-pose': {
           const pose = await posenetModel.estimateSinglePose(
-          video, 
-          imageScaleFactor, 
-          flipHorizontal, 
-          outputStride
+            video,
+            imageScaleFactor,
+            flipHorizontal,
+            outputStride
           )
           poses.push(pose)
           break
@@ -175,14 +186,13 @@ class PoseNet extends Component {
               skeletonColor,
               canvasContext
             )
-              if(this.state.isRecording === true) {
-                let newobj = {
-                  keypoints: (keypoints),
-                  date: Date.parse(new Date())
-                };
-                this.setState({arr: [...this.state.arr, newobj]});
+            if (this.state.isRecording === true) {
+              let newobj = {
+                keypoints: keypoints,
+                cadr: this.state.cadr++
               }
-
+              this.setState({arr: [...this.state.arr, newobj]})
+            }
           }
           if (showSkeleton) {
             drawSkeleton(
@@ -199,33 +209,97 @@ class PoseNet extends Component {
     }
     findPoseDetectionFrame()
   }
+  handleClickForOne = () => {
+    this.setState({isRecording: true});
+    let sock1 = setInterval(async () => {
+     await this.state.socket.emit(
+          PRISYADONE,
+          JSON.stringify(this.state.arr[this.state.arr.length - 1])
+      )
+      this.setState({
+        arr: [],
+      })
+    }, 150);
+
+    setTimeout(() => {
+
+      // this.state.socket.emit(
+      //     PRISYAD,
+      //     JSON.stringify(this.state.arr)
+      // );
+
+      // var blob = new Blob([JSON.stringify(this.state.arr, null, 2)], {
+      //   type: 'application/json;charset=utf-8'
+      // }).slice(2, -1)
+      // var url = URL.createObjectURL(blob)
+      // var elem = document.createElement('a')
+      // elem.href = url
+      // elem.download = 'filename.txt'
+      // document.body.appendChild(elem)
+      // elem.click();
+      // document.body.removeChild(elem)
+      // clearInterval(sock)
+      clearInterval(sock1);
+      this.setState({
+        isRecording: false,
+        arr: [],
+        cadr: 0
+      })
+    }, 3000)
+  };
 
   handleClick = () => {
     this.setState({isRecording: true});
-    setTimeout(() =>{
-      var blob = new Blob([JSON.stringify(this.state.arr, null, 2)], {type: "application/json;charset=utf-8"}).slice(2,-1);
-      var url = URL.createObjectURL(blob);
-      var elem = document.createElement("a");
-      elem.href = url;
-      elem.download = 'filename.txt';
-      document.body.appendChild(elem);
-      elem.click();
-      document.body.removeChild(elem);
-      this.setState({isRecording: false,
-      arr: []});
-    }, 3000 )
-  }
+    let sock = setInterval(() => {
+      this.state.socket.emit(
+        PRISYAD,
+        JSON.stringify(this.state.arr)
+      )
+    }, 3000);
+    // let sock1 = setInterval(() => {
+    //   this.state.socket.emit(
+    //       PRISYADONE,
+    //       JSON.stringify(this.state.arr[this.state.arr.length - 1])
+    //   )
+    // }, 200);
 
+    setTimeout(() => {
+
+        // this.state.socket.emit(
+        //     PRISYAD,
+        //     JSON.stringify(this.state.arr)
+        // );
+
+      var blob = new Blob([JSON.stringify(this.state.arr, null, 2)], {
+        type: 'application/json;charset=utf-8'
+      }).slice(2, -1)
+      var url = URL.createObjectURL(blob)
+      var elem = document.createElement('a')
+      elem.href = url
+      elem.download = 'filename.txt'
+      document.body.appendChild(elem)
+      // elem.click();
+      document.body.removeChild(elem)
+      clearInterval(sock)
+      // clearInterval(sock1)
+      this.setState({
+        isRecording: false,
+        arr: [],
+        cadr: 0
+      })
+    }, 3000)
+  }
 
   render() {
     return (
       <div>
-        <div>
           <video id="videoNoShow" playsInline ref={this.getVideo} />
           <canvas className="webcam" ref={this.getCanvas} />
           <button onClick={this.handleClick}>start</button>
+          <button onClick={this.handleClickForOne}>
+          send one
+        </button>
         </div>
-      </div>
     )
   }
 }
