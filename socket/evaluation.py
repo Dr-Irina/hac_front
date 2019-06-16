@@ -24,7 +24,6 @@ def evaluate(json_object):
         return dictionary
     l = {}
     l[0] = parse_objects(data)
-    print(l)
     cadr = data['cadr'] / 30 * 1000
     print(cadr)
     df = pd.DataFrame(l).transpose()
@@ -40,4 +39,5 @@ def evaluate(json_object):
 
     with open("linear_model", 'rb') as lr:
         linereg = pickle.load(lr)
-    print(((linereg.predict(x) - cadr ) ** 2) ** 0.5  > 1000)
+    print(x.shape)
+    return(((linereg.predict(x) - cadr ) ** 2) ** 0.5  > 1000)
