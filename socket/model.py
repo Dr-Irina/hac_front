@@ -8,6 +8,9 @@ from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
 import sqlite3
 import pickle
+from sklearn.linear_model import ElasticNet
+from sklearn.model_selection import cross_val_score
+
 
 
 def train_model(json_arrays):
@@ -24,7 +27,6 @@ def train_model(json_arrays):
         return dictionary
 
 
-    # In[63]:
 
 
     def preprocess(data):
@@ -38,7 +40,6 @@ def train_model(json_arrays):
         return data_array
 
 
-    # In[65]:
 
 
     #data = {'x' : x_array, 'y': y_array, 'score' : score_array, 'timing' : data_array}
@@ -47,12 +48,12 @@ def train_model(json_arrays):
         'rightEye_x', 'rightEye_y'], axis=1, inplace=True)
 
 
-    # In[120]:
+
+
 
 
     
 
-    polyf = PolynomialFeatures(degree = 5)
     train_x = np.asanyarray(df[['leftElbow_x',
         'leftElbow_y',
         'leftKnee_x', 'leftKnee_y',  'leftShoulder_x',
@@ -64,13 +65,18 @@ def train_model(json_arrays):
     array_y = np.asanyarray(df.index)
 
 
-    linereg = LinearRegression()
-    linereg.fit(train_x, array_y)
-    yhat = linereg.predict(train_x)
+    elnet = ElasticNet(alpha=1, positive=True, selection='cyclic')
 
+    #scores = cross_val_score(elnet, train_x, array_y, cv=5)
+    #print(scores)
+    #print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
+
+    elnet.fit(train_x, array_y)
+    yhat = elnet.predict(train_x)
+    print(yhat)
     db = sqlite3.connect("database.db")
     cursor = db.cursor()
-    serialized = pickle.dumps(linereg)
+    serialized = pickle.dumps(elnet)
     with open("linear_model", 'wb') as lr:
         lr.write(serialized)
         
