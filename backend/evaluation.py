@@ -39,5 +39,5 @@ def evaluate(json_object):
 
     with open("linear_model", 'rb') as lr:
         linereg = pickle.load(lr)
-    print(x.shape)
-    return 0 if (((linereg.predict(x) - cadr ) ** 2) ** 0.5  > 1000) else 1
+    print((((linereg.predict(x) - cadr ) ** 2) ** 0.5  > 800))
+    return 0 if (((linereg.predict(x) - cadr ) ** 2) ** 0.5  > 800) else 1
