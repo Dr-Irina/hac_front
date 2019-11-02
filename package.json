@@ -63,7 +63,7 @@
     "redux-logger": "^2.8.1",
     "redux-thunk": "^2.3.0",
     "semantic-ui-react": "^0.87.2",
-    "sequelize": "^4.38.0",
+    "sequelize": "^5.15.1",
     "socket.io": "^2.1.1",
     "stats.js": "^0.17.0",
     "style-loader": "^0.23.1",
